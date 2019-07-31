@@ -41,13 +41,13 @@ public:
 
 	std::vector<float> calcOutput(std::vector<float> input);
 	
-  void learnNetwork(vector<float> vInput,
-							      vector<float> vOutput,
+  void learnNetwork(vector<float>& vInput,
+							      vector<float>& vOutput,
 							      float fLearningRate = 0.1,
 							      float fAlpha = 0.0f);
 
-  void runTraining(vector<vector<float> > pIn, 
-                   vector<vector<float> > pOut, 
+  void runTraining(vector<vector<float> >& pIn, 
+                   vector<vector<float> >& pOut, 
                    int iNumSteps = 100000, 
                    float fLearningRate = 0.1, 
                    float fAlpha = 0.0f, 

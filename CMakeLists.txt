@@ -12,9 +12,15 @@ if( OPENMP_FOUND)
   set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}" )
 endif()
 
+find_package( OpenCV REQUIRED )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+
+find_package( OpenAL REQUIRED )
+include_directories( ${OPENAL_INCLUDE_DIR} )
+
 include_directories( include . )
 
 add_library( lucia feedforward.cpp lucia.cpp main.cpp )
 
 add_executable( Lucia main.cpp )
-target_link_libraries( Lucia lucia )
+target_link_libraries( Lucia lucia ${OpenCV_LIBS} ${OPENAL_LIBRARY})

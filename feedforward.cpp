@@ -92,7 +92,7 @@ std::vector<float> feedForward::calcOutput(std::vector<float> vInput) {
 	return m_vOutput;
 }
 
-void feedForward::learnNetwork(vector<float> vInput, vector<float> vOutput, float fLearningRate, float fAlpha) {
+void feedForward::learnNetwork(vector<float>& vInput, vector<float>& vOutput, float fLearningRate, float fAlpha) {
 	m_fLearningRate = fLearningRate;
 	m_fAlpha = fAlpha;
 
@@ -207,7 +207,7 @@ void feedForward::createHiddenFromString(const string str_hiddenLayer) {
 }
 
 
-void feedForward::runTraining(vector<vector<float> > pIn, vector<vector<float> > pOut, int iNumSteps, float fLearningRate, float fAlpha, int iNumExamples) {
+void feedForward::runTraining(vector<vector<float> >& pIn, vector<vector<float> >& pOut, int iNumSteps, float fLearningRate, float fAlpha, int iNumExamples) {
   bool bLearned = true;
   int  iStep = 0;
 
@@ -235,6 +235,7 @@ void feedForward::runTraining(vector<vector<float> > pIn, vector<vector<float> >
     
     iStep++;
     printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b%d Step", iStep);
+    fflush(stdout);
   } while((!bLearned)&&(iStep < iNumSteps));
   
   endTime = clock() - startTime;
@@ -244,7 +245,7 @@ void feedForward::runTraining(vector<vector<float> > pIn, vector<vector<float> >
 }
 
 vector<float> feedForward::makeClean(vector<float> vIn) {
-  for(int i = 0; i < vIn.size(); ++i) {
+  for(uint i = 0; i < vIn.size(); ++i) {
     if(vIn[i] < 0.5f) 
       vIn[i] = 0.0f; 
     else 
@@ -257,7 +258,7 @@ vector<float> feedForward::makeClean(vector<float> vIn) {
 bool feedForward::isCorrect(vector<float> vIn, vector<float> vOut) {
   float fSum = 0.0f;
 
-  for(int a = 0; a < vIn.size(); ++a)
+  for(uint a = 0; a < vIn.size(); ++a)
       fSum += pow((vIn[a] - vOut[a]), 2);
 
   if(fSum == 0) 
@@ -269,7 +270,7 @@ bool feedForward::isCorrect(vector<float> vIn, vector<float> vOut) {
 void feedForward::printv(vector<float> vIn) {
   cout<<"(";
   
-  for(int i = 0; i < vIn.size(); ++i)
+  for(uint i = 0; i < vIn.size(); ++i)
     cout<<vIn[i];
   cout<<")"<<endl;
 }
