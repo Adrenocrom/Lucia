@@ -205,3 +205,72 @@ void feedForward::createHiddenFromString(const string str_hiddenLayer) {
 		m_vPerLayer.push_back(iNumHidden);
 	}
 }
+
+
+void feedForward::runTraining(vector<vector<float> > pIn, vector<vector<float> > pOut, int iNumSteps, float fLearningRate, float fAlpha, int iNumExamples) {
+  bool bLearned = true;
+  int  iStep = 0;
+
+  if(iNumExamples < 0)
+    iNumExamples = pIn.size();
+                 
+  printf("train core with %d examples\n", iNumExamples);
+
+  clock_t startTime;
+  clock_t endTime;
+  float fTime = 0.0f;
+  
+  startTime = clock();
+
+  do {
+    bLearned = true;
+    
+    for(int a = 0; a < iNumExamples; ++a) {
+                          
+      if(!isCorrect(pOut[a], makeClean(calcOutput(pIn[a])))) {
+         learnNetwork(pIn[a], pOut[a], fLearningRate, fAlpha);
+         bLearned = false;
+      }
+    }
+    
+    iStep++;
+    printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b%d Step", iStep);
+  } while((!bLearned)&&(iStep < iNumSteps));
+  
+  endTime = clock() - startTime;
+  fTime = (float) endTime/((float)CLOCKS_PER_SEC);
+  printf("\ntrained and %.3f s needed\n", fTime);
+  saveWeights("net.txt");
+}
+
+vector<float> feedForward::makeClean(vector<float> vIn) {
+  for(int i = 0; i < vIn.size(); ++i) {
+    if(vIn[i] < 0.5f) 
+      vIn[i] = 0.0f; 
+    else 
+      vIn[i] = 1.0f;
+  }
+
+  return vIn;
+}
+
+bool feedForward::isCorrect(vector<float> vIn, vector<float> vOut) {
+  float fSum = 0.0f;
+
+  for(int a = 0; a < vIn.size(); ++a)
+      fSum += pow((vIn[a] - vOut[a]), 2);
+
+  if(fSum == 0) 
+    return true;
+
+  return false;
+}
+
+void feedForward::printv(vector<float> vIn) {
+  cout<<"(";
+  
+  for(int i = 0; i < vIn.size(); ++i)
+    cout<<vIn[i];
+  cout<<")"<<endl;
+}
+
