@@ -57,18 +57,21 @@ int main(int argc, char** argv) {
   return 0;
 }*/
 
-const int SRATE = 44100;
-const int SSIZE = 1024;
-
-ALbyte buffer[22050];
-ALint sample;
+ALbyte buffer[1048576];
+ALint num_samples;
 
 int main(int argc, char *argv[]) {
-  ALCdevice *device = alcCaptureOpenDevice(NULL, SRATE, AL_FORMAT_STEREO16, SSIZE);
+  ALCdevice *device = alcCaptureOpenDevice(alcGetString(NULL, ALC_CAPTURE_DEVICE_SPECIFIER), 44100, AL_FORMAT_STEREO16, 1024);
   if(device == nullptr) {
   	cout<<"could not open device";
 	return 1;
   }
+  
+  cout<<alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER)<<endl;
+  cout<<alcGetString(NULL, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)<<endl;
+  cout<<alcGetString(NULL, ALC_DEVICE_SPECIFIER)<<endl;
+  cout<<alcGetString(NULL, ALC_CAPTURE_DEVICE_SPECIFIER)<<endl;
+  cout<<alcGetString(NULL, ALC_EXTENSIONS)<<endl;
 
   alcCaptureStart(device);
 
@@ -76,26 +79,25 @@ int main(int argc, char *argv[]) {
   int minV = 0;
   int maxV = 0;
   while (true) {
-    alcGetIntegerv(device, ALC_CAPTURE_SAMPLES, (ALCsizei)sizeof(ALint), &sample);
-    alcCaptureSamples(device, (ALCvoid *)buffer, sample);
+    alcGetIntegerv(device, ALC_CAPTURE_SAMPLES, sizeof(ALint), &num_samples);
+    
+	if(num_samples > 0) {
+		alcCaptureSamples(device, (ALCvoid *)buffer, num_samples);
 
-	//cout<<sample<<endl;
+		if(last != abs((int)*buffer)) {
+			last = abs((int)*buffer);
 
-	if(last != abs((int)*buffer)) {
-		last = abs((int)*buffer);
+			if(last < minV)
+				minV = last;
+			if(last > maxV)
+				maxV = last;
 
-		if(last < minV)
-			minV = last;
-		if(last > maxV)
-			maxV = last;
-
-		if(last > 100) {
-			for(int i = 100; i < last; i++)
-				cout<<"*";
-			cout<<endl;
+			if(last > 100) {
+				for(int i = 100; i < last; i++)
+					cout<<"*";
+				cout<<" "<<num_samples<<endl;
+			}
 		}
-
-	//	cout<<last<<"\t"<<minV<<"\t"<<maxV<<endl;
 	}
   }
        
