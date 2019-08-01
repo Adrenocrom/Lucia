@@ -64,8 +64,6 @@ int main(int argc, char *argv[]) {
   short buffer[FREQ * 2];
   ALCint num_samples;
 
-
-
   ALCdevice *device = alcCaptureOpenDevice(NULL, FREQ, AL_FORMAT_MONO16, (int)((float)FREQ/2.0f) );
   if(device == nullptr) {
   	cout<<"could not open device";
