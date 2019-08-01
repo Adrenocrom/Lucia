@@ -24,5 +24,6 @@ using namespace std;
 typedef unsigned int uint;
 
 #include "feedforward.h"
+#include "alset.h"
 
 #endif

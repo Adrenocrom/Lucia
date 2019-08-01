@@ -8,7 +8,7 @@
 #define OUTUNIT 		0
 #define HIDDENUNIT 	1
 
-class feedForward {
+class FeedForward {
   private:
   	int m_iNumHiddenLayer;
   	int m_iNumLayer;
@@ -31,11 +31,11 @@ class feedForward {
     vector<vector<float> > m_vvOut;
 
 public:
-	feedForward(int iNumInputNeurons,
+	FeedForward(int iNumInputNeurons,
               int iNumOutPutNeurons,
               const string str_hiddenLayer);
 
-	~feedForward();
+	~FeedForward();
 
 	void setInputAndOutput(vector<vector<float> > vvIn, vector<vector<float> > vvOut);
 
@@ -70,4 +70,3 @@ public:
 };
 
 #endif
-

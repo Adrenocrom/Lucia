@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 
 int main(int argc, char *argv[]) {
   int FREQ = 22050;
-  int CAP_SIZE = 2048;
+  int CAP_SIZE = 4096; //2048;
 
   short buffer[FREQ * 2];
   ALCint num_samples;
@@ -96,9 +96,9 @@ int main(int argc, char *argv[]) {
 		  		maxV = last;
 
 			  if(last > 100) {
-			  	for(int i = 100; i < last; i++)
-				  	cout<<"*";
-				  cout<<" "<<num_samples<<endl;
+			  	for(int i = 100; i < last; i+=3)
+				  	cout<<"|";
+				  cout<<"["<<num_samples<<"]"<<endl;
 			  }
 		  }
 	  }

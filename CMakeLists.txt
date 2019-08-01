@@ -20,7 +20,7 @@ include_directories( ${OPENAL_INCLUDE_DIR} )
 
 include_directories( include . )
 
-add_library( lucia feedforward.cpp lucia.cpp main.cpp )
+add_library( lucia feedforward.cpp lucia.cpp alset.cpp main.cpp )
 
 add_executable( Lucia main.cpp )
 target_link_libraries( Lucia lucia ${OpenCV_LIBS} ${OPENAL_LIBRARY})

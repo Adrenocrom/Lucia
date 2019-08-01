@@ -1,6 +1,6 @@
 #include "lucia.h"
 
-feedForward::feedForward(int iNumInputNeurons, int iNumOutputNeurons, const string str_hiddenLayer) {
+FeedForward::FeedForward(int iNumInputNeurons, int iNumOutputNeurons, const string str_hiddenLayer) {
 	m_vPerLayer.push_back(iNumInputNeurons);
 	createHiddenFromString(str_hiddenLayer);
 	m_vPerLayer.push_back(iNumOutputNeurons);
@@ -43,9 +43,9 @@ feedForward::feedForward(int iNumInputNeurons, int iNumOutputNeurons, const stri
 	}
 }
 
-feedForward::~feedForward() { }
+FeedForward::~FeedForward() { }
 
-void feedForward::setAllWeights(float fWeight) {
+void FeedForward::setAllWeights(float fWeight) {
 	for(int l = 0; l < m_iNumLayer; ++l) {
 		for(int i = 0; i < m_vPerLayer[l+1]; ++i) {
 			for(int j = 0; j < m_vPerLayer[l]+1; ++j) {
@@ -55,11 +55,11 @@ void feedForward::setAllWeights(float fWeight) {
 	}
 }
 
-void feedForward::setWeight(int l, int i, int j, float w) {
+void FeedForward::setWeight(int l, int i, int j, float w) {
 	m_pppMatrix[l][i][j] = w;
 }
 
-std::vector<float> feedForward::calcOutput(std::vector<float> vInput) {
+std::vector<float> FeedForward::calcOutput(std::vector<float> vInput) {
 	m_vInput = vInput;
 	m_vInput.push_back(-1.0f);
 	m_vOutput.clear();
@@ -92,7 +92,7 @@ std::vector<float> feedForward::calcOutput(std::vector<float> vInput) {
 	return m_vOutput;
 }
 
-void feedForward::learnNetwork(vector<float>& vInput, vector<float>& vOutput, float fLearningRate, float fAlpha) {
+void FeedForward::learnNetwork(vector<float>& vInput, vector<float>& vOutput, float fLearningRate, float fAlpha) {
 	m_fLearningRate = fLearningRate;
 	m_fAlpha = fAlpha;
 
@@ -127,7 +127,7 @@ void feedForward::learnNetwork(vector<float>& vInput, vector<float>& vOutput, fl
 	}
 }
 
-void feedForward::loadWeights(const string filename) {
+void FeedForward::loadWeights(const string filename) {
 	FILE* pFile = nullptr;
 
 	if((pFile = fopen(filename.c_str(), "r")) == nullptr) {
@@ -160,7 +160,7 @@ void feedForward::loadWeights(const string filename) {
 	}
 }
 
-void feedForward::saveWeights(const string filename) {
+void FeedForward::saveWeights(const string filename) {
 	FILE* pFile = nullptr;
 
 	if((pFile = fopen(filename.c_str(), "w")) == nullptr) {
@@ -195,7 +195,7 @@ void feedForward::saveWeights(const string filename) {
 	}
 }
 
-void feedForward::createHiddenFromString(const string str_hiddenLayer) {
+void FeedForward::createHiddenFromString(const string str_hiddenLayer) {
 	stringstream hidden(str_hiddenLayer);
 	string str_hidden;
 	while(getline(hidden, str_hidden, ',')) {
@@ -207,7 +207,7 @@ void feedForward::createHiddenFromString(const string str_hiddenLayer) {
 }
 
 
-void feedForward::runTraining(vector<vector<float> >& pIn, vector<vector<float> >& pOut, int iNumSteps, float fLearningRate, float fAlpha, int iNumExamples) {
+void FeedForward::runTraining(vector<vector<float> >& pIn, vector<vector<float> >& pOut, int iNumSteps, float fLearningRate, float fAlpha, int iNumExamples) {
   bool bLearned = true;
   int  iStep = 0;
 
@@ -244,7 +244,7 @@ void feedForward::runTraining(vector<vector<float> >& pIn, vector<vector<float> 
   saveWeights("net.txt");
 }
 
-vector<float> feedForward::makeClean(vector<float> vIn) {
+vector<float> FeedForward::makeClean(vector<float> vIn) {
   for(uint i = 0; i < vIn.size(); ++i) {
     if(vIn[i] < 0.5f) 
       vIn[i] = 0.0f; 
@@ -255,7 +255,7 @@ vector<float> feedForward::makeClean(vector<float> vIn) {
   return vIn;
 }
 
-bool feedForward::isCorrect(vector<float> vIn, vector<float> vOut) {
+bool FeedForward::isCorrect(vector<float> vIn, vector<float> vOut) {
   float fSum = 0.0f;
 
   for(uint a = 0; a < vIn.size(); ++a)
@@ -267,7 +267,7 @@ bool feedForward::isCorrect(vector<float> vIn, vector<float> vOut) {
   return false;
 }
 
-void feedForward::printv(vector<float> vIn) {
+void FeedForward::printv(vector<float> vIn) {
   cout<<"(";
   
   for(uint i = 0; i < vIn.size(); ++i)
