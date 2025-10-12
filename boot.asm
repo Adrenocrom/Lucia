@@ -39,7 +39,7 @@ _start:
     ret
 
 section .data
-    strHelloWorld db __utf16__ `hello, world!\r\n\0`
+    strHelloWorld db __utf16__ `Hello World!\r\n\0`
 
 	image           dq 0
 	systemTable     dq 0
