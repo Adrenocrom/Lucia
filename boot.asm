@@ -7,43 +7,6 @@ section .text
 
 %include "efi.asm"
 
-
-; r8 = 64‑bit unsigned value
-; rdi = pointer to a buffer that can hold up to 21 UTF‑16 chars (incl. null)
-convert_uint_to_utf16:
-    push    rbx rsi rdx                ; save callee‑saved registers
-    xor     rdx, rdx                  ; high 64 bits = 0
-    mov     rcx, 10
-    mov     rsi, 0                     ; digit count
-    mov     rbx, rdi                  ; store buffer base
-
-    ; 1st pass – gather digits in reverse
-convert_loop:
-    cmp     r8, 0
-    je      convert_end
-    div     rcx                        ; rdx = r8 % 10
-    mov     rsi, rdx
-    mov     [rbx + rsi], dl            ; store digit
-    inc     rsi
-    mov     r8, rax
-    jmp     convert_loop
-
-convert_end:
-    ; 2nd pass – write UTF‑16 buffer (reverse order)
-    mov     rdx, rsi
-    mov     rsi, rdi
-    add     rsi, 20*2
-reverse_loop:
-    dec     rdx
-    mov     cl, [rbx + rdx]
-    mov     [rsi - 2], cx
-    sub     rsi, 2
-    test    rdx, rdx
-    jnz     reverse_loop
-    mov     word [rsi], 0              ; null‑terminate
-    pop     rdx rsi rbx
-    ret
-
 _start:
     sub rsp, 32
 
@@ -91,14 +54,6 @@ _start:
 	add rbx, 1
 	mov rcx, 2000000
 	call[stall]
-
-    mov rcx, [conout]          ; 1st arg: EFI_OUTPUT_PROTOCOL*
-    lea rdx, [strCount2]   ; 2nd arg: CHAR16*   (pointer to our string)
-    call [outputString]        ; indirect call (or `call r8` works the same)
-
-	mov rdi, [buffer]
-	mov r8, rbx
-	call [convert_uint_to_utf16]
 
     mov rcx, [conout]          ; 1st arg: EFI_OUTPUT_PROTOCOL*
     lea rdx, [strCount2]   ; 2nd arg: CHAR16*   (pointer to our string)
