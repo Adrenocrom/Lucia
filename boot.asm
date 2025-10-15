@@ -96,7 +96,7 @@ _start:
 
 section .data
     strMessage1 db __utf16__ `Enter a Key to step foreward\r\n\0`
-    strMessage2 db __utf16__ `You entered a new Part!\r\n\0`
+    strMessage2 db __utf16__ `You entered a new Part, thats cool!\r\n\0`
 
     strCount1 db __utf16__ `Count 1\r\n\0`
     strCount2 db __utf16__ `Count 2\r\n\0`

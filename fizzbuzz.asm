@@ -119,7 +119,7 @@ _start:
 	mov rcx, rbx
 	call printFizzBuss
 	
-	cmp rbx, 1000
+	cmp rbx, 1000000
 	jne .loop
 
 	mov rax, 60
