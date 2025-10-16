@@ -7,6 +7,7 @@
 #define EFI_SUCCESS 0L;
 #define IN
 #define OUT
+#define OPTIONAL
 
 typedef uint16_t CHAR16;
 typedef uint64_t UINTN;
@@ -21,7 +22,7 @@ typedef int16_t INT16;
 typedef int8_t INT8;
 
 typedef void VOID;
-typedef bool BOOLEAN;
+typedef unsigned char BOOLEAN;
 
 typedef UINTN EFI_STATUS;
 
@@ -64,6 +65,7 @@ typedef struct {
 
 struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
+struct _EFI_GRAPHICS_OUTPUT_PROTOCOL;
 
 typedef
 EFI_STATUS
@@ -94,11 +96,50 @@ EFI_STATUS
 	OUT UINTN *Index
 );
 
+typedef enum {
+	AllHandles,
+	ByRegisterNotify,
+	ByProtocol
+} EFI_LOCATE_SEARCH_TYPE;
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_LOCATE_PROTOCOL) (
+	IN EFI_GUID *Protocol,
+	IN VOID *Registration OPTIONAL,
+	OUT VOID **Interface
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_LOCATE_HANDLE_BUFFER) (
+	IN EFI_LOCATE_SEARCH_TYPE SearchType,
+	IN EFI_GUID *Protocol OPTIONAL,
+	IN VOID *SearchKey OPTIONAL,
+	IN OUT UINTN *NoHandles,
+	OUT EFI_HANDLE **Buffer
+);
+
 typedef
 EFI_STATUS
 (EFIAPI *EFI_STALL) (
 	IN UINTN Microseconds
 );
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_TEXT_CLEAR_SCREEN) (
+	IN struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE) (
+	IN struct _EFI_GRAPHICS_OUTPUT_PROTOCOL *This,
+	IN UINT32 ModeNumber
+);
+
+#define EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID { 0x9042a9de, 0x23dc, 0x4a38, {0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a } }
 
 typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
 	EFI_INPUT_RESET Reset;
@@ -113,11 +154,123 @@ typedef struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
 	void* QueryMode;
 	void* SetMode;
 	void* SetAttribute;
-	void* ClearScreen;
+	EFI_TEXT_CLEAR_SCREEN ClearScreen;
 	void* SetCursorPosition;
 	void* EnableCursor;
 	void* Mode;
 } EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
+
+typedef struct {
+	UINT8 Blue;
+	UINT8 Green;
+	UINT8 Red;
+	UINT8 Reserved;
+} EFI_GRAPHICS_OUTPUT_BLT_PIXEL;
+
+typedef enum {
+	EfiBltVideoFill,
+	EfiBltVideoToBltBuffer,
+	EfiBltBufferToVideo,
+	EfiBltVideoToVideo,
+	EfiGraphicsOutputBltOperationMax
+} EFI_GRAPHICS_OUTPUT_BLT_OPERATION;
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_GRAPHICS_OUTPUT_PROTOCOL_BLT) (
+	IN struct _EFI_GRAPHICS_OUTPUT_PROTOCOL *This,
+	IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer, OPTIONAL
+	IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION BltOperation,
+	IN UINTN SourceX,
+	IN UINTN SourceY,
+	IN UINTN DestinationX,
+	IN UINTN DestinationY,
+	IN UINTN Width,
+	IN UINTN Height,
+	IN UINTN Delta OPTIONAL
+);
+
+typedef enum {
+	PixelRedGreenBlueReserved8BitPerColor,
+	PixelBlueGreenRedReserved8BitPerColor,
+	PixelBitMask,
+	PixelBltOnly,
+	PixelFormatMax
+} EFI_GRAPHICS_PIXEL_FORMAT;
+
+typedef struct {
+	UINT32 RedMask;
+	UINT32 GreenMask;
+	UINT32 BlueMask;
+	UINT32 ReservedMask;
+} EFI_PIXEL_BITMASK;
+
+typedef struct {
+	UINT32 Version;
+	UINT32 HorizontalResolution;
+	UINT32 VerticalResolution;
+	EFI_GRAPHICS_PIXEL_FORMAT PixelFormat;
+	EFI_PIXEL_BITMASK PixelInformation;
+	UINT32 PixelsPerScanLine;
+} EFI_GRAPHICS_OUTPUT_MODE_INFORMATION;
+
+typedef enum {
+	EfiReservedMemoryType,
+	EfiLoaderCode,
+	EfiLoaderData,
+	EfiBootServicesCode,
+	EfiBootServicesData,
+	EfiRuntimeServicesCode,
+	EfiRuntimeServicesData,
+	EfiConventionalMemory,
+	EfiUnusableMemory,
+	EfiACPIReclaimMemory,
+	EfiACPIMemoryNVS,
+	EfiMemoryMappedIO,
+	EfiMemoryMappedIOPortSpace,
+	EfiPalCode,
+	EfiPersistentMemory,
+	EfiMaxMemoryType
+} EFI_MEMORY_TYPE;
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_ALLOCATE_POOL) (
+	IN EFI_MEMORY_TYPE PoolType,
+	IN UINTN Size,
+	OUT VOID **Buffer
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_FREE_POOL) (
+	IN VOID *Buffer
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE) (
+	IN struct _EFI_GRAPHICS_OUTPUT_PROTOCOL *This,
+	IN UINT32 ModeNumber,
+	OUT UINTN *SizeOfInfo,
+	OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION **Info
+);
+
+typedef struct {
+	UINT32 MaxMode;
+	UINT32 Mode;
+	EFI_GRAPHICS_OUTPUT_MODE_INFORMATION* Info;
+	UINTN SizeOfInfo;
+	UINT64 FrameBufferBase;
+	UINTN FrameBufferSize;
+} EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE;
+
+typedef struct _EFI_GRAPHICS_OUTPUT_PROTOCOL {
+	EFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE QueryMode;
+	EFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE SetMode;
+	EFI_GRAPHICS_OUTPUT_PROTOCOL_BLT Blt;
+	EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE *Mode;
+} EFI_GRAPHICS_OUTPUT_PROTOCOL;
 
 typedef struct {
 	EFI_TABLE_HEADER Hdr;
@@ -126,8 +279,8 @@ typedef struct {
 	void* AllocatePages;
 	void* FreePages;
 	void* GetMemoryMap;
-	void* AllocatePool;
-	void* FreePool;
+	EFI_ALLOCATE_POOL AllocatePool;
+	EFI_FREE_POOL FreePool;
 	void* CreateEvent;
 	void* SetTimer;
 	EFI_WAIT_FOR_EVENT WaitForEvent;
@@ -149,7 +302,7 @@ typedef struct {
 	void* UnloadImage;
 	void* ExitBootServices;
 	void* GetNextMonotonicCount;
-	void* Stall;
+	EFI_STALL Stall;
 	void* SetWatchdogTimer;
 	void* ConnectController;
 	void* DisconnectController;
@@ -157,8 +310,8 @@ typedef struct {
 	void* CloseProtocol;
 	void* OpenProtocolInformation;
 	void* ProtocolsPerHandle;
-	void* LocateHandleBuffer;
-	void* LocateProtocol;
+	EFI_LOCATE_HANDLE_BUFFER LocateHandleBuffer;
+	EFI_LOCATE_PROTOCOL LocateProtocol;
 	void* InstallMultipleProtocolInterfaces;
 	void* UninstallMultipleProtocolInterfaces;
 	void* CalculateCrc32;
