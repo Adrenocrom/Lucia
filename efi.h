@@ -3,31 +3,75 @@
 
 #include <stdint.h>
 
+#define EFIAPI
+#define EFI_SUCCESS 0L;
+#define IN
+#define OUT
+
+typedef uint16_t CHAR16;
+typedef uint64_t UINTN;
+typedef uint64_t UINT64;
+typedef uint32_t UINT32;
+typedef uint16_t UINT16;
+
+typedef UINTN EFI_STATUS;
+
 typedef void* EFI_HANDLE;
 typedef void* EFI_EVENT;
 
 typedef struct {
-	uint16_t ScanCode;
-	uint16_t UnicodeChar;
+	UINT16 ScanCode;
+	CHAR16 UnicodeChar;
 } EFI_INPUT_KEY;
 
 typedef struct {
 	uint64_t Signature;  
-	uint32_t Revision;
-	uint32_t HeaderSize;
-	uint32_t CRC32;
-	uint32_t Reserved;
+	UINT32 Revision;
+	UINT32 HeaderSize;
+	UINT32 CRC32;
+	UINT32 Reserved;
 } EFI_TABLE_HEADER;
 
-typedef struct {
+struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
+struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_INPUT_READ_KEY) (
+	IN struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This,
+	OUT EFI_INPUT_KEY *Key
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_TEXT_STRING) (
+	IN struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
+	IN CHAR16 *String
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_WAIT_FOR_EVENT) (
+	IN UINTN NumberOfEvents,
+	IN EFI_EVENT *Event,
+	OUT UINTN *Index
+);
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_STALL) (
+	IN UINTN Microseconds
+);
+
+typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
 	void* Reset;
-	void* ReadKeyStroke;
+	EFI_INPUT_READ_KEY ReadKeyStroke;
 	EFI_EVENT WaitForKey;
 } EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
-typedef struct {
+typedef struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
 	void* Reset;
-	void* OutputString;
+	EFI_TEXT_STRING OutputString;
 	void* TestString;
 	void* QueryMode;
 	void* SetMode;
@@ -49,7 +93,7 @@ typedef struct {
 	void* FreePool;
 	void* CreateEvent;
 	void* SetTimer;
-	void* WaitForEvent;
+	EFI_WAIT_FOR_EVENT WaitForEvent;
 	void* SignalEvent;
 	void* CloseEvent;
 	void* CheckEvent;
@@ -107,7 +151,7 @@ typedef struct {
 typedef struct {
 	EFI_TABLE_HEADER Hdr;
 	void* FirmwareVendor;
-	uint32_t FirmwareRevision;
+	UINT32 FirmwareRevision;
 	EFI_HANDLE ConsoleInHandle;
 	EFI_SIMPLE_TEXT_INPUT_PROTOCOL* ConIn;
 	EFI_HANDLE ConsoleOutHandle;
@@ -116,13 +160,8 @@ typedef struct {
 	void* StdErr;
 	EFI_RUNTIME_SERVICES* RuntimeServices;
 	EFI_BOOT_SERVICES* BootServices;
-	uint64_t NumberOfTableEntries;
+	UINTN NumberOfTableEntries;
 	void* ConfigurationTable;
 } EFI_SYSTEM_TABLE;
-
-typedef void (*EFI_TEXT_OUTPUT_STRING) (EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* ConOut, uint16_t* String);
-typedef void (*EFI_WAIT_FOR_EVENT) (uint64_t NumberOfEvents, EFI_EVENT* Event, uint64_t* Index);
-typedef void (*EFI_STALL) (uint64_t Microseconds);
-typedef void (*EFI_INPUT_READ_KEY) (EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, EFI_INPUT_KEY *Key);
 
 #endif
