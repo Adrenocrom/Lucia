@@ -13,11 +13,41 @@ typedef uint64_t UINTN;
 typedef uint64_t UINT64;
 typedef uint32_t UINT32;
 typedef uint16_t UINT16;
+typedef uint8_t UINT8;
+typedef int64_t INTN;
+typedef int64_t INT64;
+typedef int32_t INT32;
+typedef int16_t INT16;
+typedef int8_t INT8;
+
+typedef void VOID;
+typedef bool BOOLEAN;
 
 typedef UINTN EFI_STATUS;
 
 typedef void* EFI_HANDLE;
 typedef void* EFI_EVENT;
+
+typedef struct {          
+    UINT32  Data1;
+    UINT16  Data2;
+    UINT16  Data3;
+    UINT8   Data4[8]; 
+} EFI_GUID;
+
+typedef struct {          
+    UINT16      Year;       // 1998 - 20XX
+    UINT8       Month;      // 1 - 12
+    UINT8       Day;        // 1 - 31
+    UINT8       Hour;       // 0 - 23
+    UINT8       Minute;     // 0 - 59
+    UINT8       Second;     // 0 - 59
+    UINT8       Pad1;
+    UINT32      Nanosecond; // 0 - 999,999,999
+    INT16       TimeZone;   // -1440 to 1440 or 2047
+    UINT8       Daylight;
+    UINT8       Pad2;
+} EFI_TIME;
 
 typedef struct {
 	UINT16 ScanCode;
@@ -34,6 +64,13 @@ typedef struct {
 
 struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 struct _EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
+
+typedef
+EFI_STATUS
+(EFIAPI *EFI_INPUT_RESET) (
+	IN struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This,
+	IN BOOLEAN ExtendedVerification
+);
 
 typedef
 EFI_STATUS
@@ -64,7 +101,7 @@ EFI_STATUS
 );
 
 typedef struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
-	void* Reset;
+	EFI_INPUT_RESET Reset;
 	EFI_INPUT_READ_KEY ReadKeyStroke;
 	EFI_EVENT WaitForKey;
 } EFI_SIMPLE_TEXT_INPUT_PROTOCOL;
@@ -148,20 +185,25 @@ typedef struct {
 	void* QueryVariableInfo;
 } EFI_RUNTIME_SERVICES;
 
+typedef struct{
+	EFI_GUID VendorGuid;
+	VOID* VendorTable;
+} EFI_CONFIGURATION_TABLE;
+
 typedef struct {
 	EFI_TABLE_HEADER Hdr;
-	void* FirmwareVendor;
+	CHAR16* FirmwareVendor;
 	UINT32 FirmwareRevision;
 	EFI_HANDLE ConsoleInHandle;
 	EFI_SIMPLE_TEXT_INPUT_PROTOCOL* ConIn;
 	EFI_HANDLE ConsoleOutHandle;
 	EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* ConOut;
 	EFI_HANDLE StandardErrorHandle;
-	void* StdErr;
+	EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* StdErr;
 	EFI_RUNTIME_SERVICES* RuntimeServices;
 	EFI_BOOT_SERVICES* BootServices;
 	UINTN NumberOfTableEntries;
-	void* ConfigurationTable;
+	EFI_CONFIGURATION_TABLE* ConfigurationTable;
 } EFI_SYSTEM_TABLE;
 
 #endif
